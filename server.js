@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 dotenv.config();
 const connectDB = require("./src/config/db");
+// ==ROUTES == //
+const userRoutes = require("./src/Routes/userRoutes");
+// ==ROUTES == //
 
 const app = express();
 
@@ -15,6 +18,9 @@ connectDB();
 // CONNECT TO DATABASE
 app.use(express.static("public"));
 
+// ROUTES
+app.use("api/v1/users", userRoutes);
+// ROUTES
 app.get("/", (req, res) => {
   res.send("Welcome To Online Courses");
 });
