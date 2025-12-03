@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const { verify } = require("jsonwebtoken");
 
 const userSchema = mongoose.Schema(
   {
@@ -26,7 +27,6 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      required: true,
       enum: ["admin", "instructor", "user"],
       default: "user",
     },
@@ -41,6 +41,21 @@ const userSchema = mongoose.Schema(
     tokenVersion: {
       type: Number,
       default: 0,
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: Number,
+      unique: true,
+    },
+    verificationCodeExpire: {
+      type: Date,
     },
   },
   { timestamps: true }
@@ -57,4 +72,9 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+userSchema.methods.generateVerificationCode = function () {
+  this.verificationCode = Math.floor(100000 + Math.random() * 900000);
+  this.verificationCodeExpire = Date.now() + 5 * 60 * 1000;
+  return this.verificationCode;
+};
 module.exports = mongoose.model("User", userSchema);

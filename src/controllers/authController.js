@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { verifyGoogleToken } = require("../services/googleAuthService");
+const { sendEmail } = require("../services/emailSender");
 
 const createToken = (id, role, tokenV) => {
   const payload = { id, role, tokenV };
@@ -21,12 +22,15 @@ exports.register = async (req, res) => {
       role,
     });
     await user.save();
-    const token = createToken(user._id, user.role, user.tokenVersion);
-    user.password = undefined;
+    const code = Math.floor(100000 + Math.random() * 900000);
+    user.verificationCode = code;
+    user.verificationCodeExpire = Date.now() + 1000 * 60 * 10;
+    await user.save();
+    await sendEmail(user.email, code);
+
     res.status(201).json({
-      message: "Register Successfully",
-      user,
-      token,
+      message:
+        "Registered successfully. Please check your email for the verification code.",
     });
   } catch (error) {
     console.error(error);
@@ -44,6 +48,9 @@ exports.login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch)
       return res.status(400).json({ message: "Incorrect Email or Password" });
+
+    if (!user.emailVerified)
+      return res.status(401).json({ message: "Please Confirm Your Account" });
     user.password = undefined;
 
     const token = createToken(user._id, user.role, user.tokenVersion);
