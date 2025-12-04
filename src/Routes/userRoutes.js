@@ -10,6 +10,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/login", authController.login);
 router.post("/google", authController.loginGoogle);
 router.post("/forget-password", authController.forgetPassword);
+router.patch("/reset-password/:token", authController.resetPassword);
 router.post("/logout", protected, authController.logout);
 router.get("/me", protected, authController.profile);
 
