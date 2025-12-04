@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { verifyGoogleToken } = require("../services/googleAuthService");
 const { sendEmail } = require("../services/emailSender");
 const { sendResetPasswordEmail } = require("../services/resetPasswordEmail");
+const { uploadToCloudinary } = require("../services/cloudinaryUpload");
 const crypto = require("crypto");
 
 const createToken = (id, role, tokenV) => {
@@ -55,7 +56,6 @@ exports.login = async (req, res) => {
     user.password = undefined;
 
     const token = createToken(user._id, user.role, user.tokenVersion);
-
     res.status(200).json({
       message: "Login Successfully",
       user,
@@ -166,7 +166,55 @@ exports.profile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) return res.status(404).json({ message: "User no exist." });
-    res.status(200).json(user);
+    const imageUrl = user.profileImage
+      ? `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${user.profileImage}`
+      : null;
+    res.status(200).json({ user, imageUrl });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    if (req.body.password || req.body.passwordConfirm)
+      return res
+        .status(400)
+        .json({ message: "Not able to Change Password At this Route" });
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(400).json({ message: "User Not found" });
+
+    const { name, email, profileImage } = req.body;
+    if (name) user.name = name;
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer, "users");
+
+      user.profileImage = result.public_id;
+    }
+    if (email && email !== user.email) {
+      user.email = email;
+      user.emailVerified = false;
+      const code = Math.floor(100000 + Math.random() * 900000);
+      user.verificationCode = code;
+      user.verificationCodeExpire = Date.now() + 1000 * 60 * 10;
+      await sendEmail(user.email, code);
+      await user.save();
+      return res.status(200).json({
+        message:
+          "Profile updated successfully and Please Check Your Email To Verify",
+        user,
+      });
+    }
+    await user.save();
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user,
+      imageUrl: user.profileImage
+        ? `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${user.profileImage}`
+        : null,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
