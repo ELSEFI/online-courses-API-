@@ -19,7 +19,7 @@ const instructorProfileSchema = new mongoose.Schema(
       en: { type: String, required: true },
       ar: { type: String, required: true },
     },
-    cvURL: {
+    cvFile: {
       type: String,
       required: true,
     },

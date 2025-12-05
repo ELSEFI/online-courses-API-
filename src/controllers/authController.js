@@ -14,7 +14,7 @@ const createToken = (id, role, tokenV) => {
 };
 
 exports.register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "Email Already Exits" });
@@ -23,7 +23,6 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
-      role,
       verificationCode: code,
       verificationCodeExpire: Date.now() + 1000 * 60 * 10,
     });
@@ -206,7 +205,7 @@ exports.updateProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(400).json({ message: "User Not found" });
 
-    const { name, email, profileImage } = req.body;
+    const { name, email} = req.body;
     if (name) user.name = name;
     if (req.file) {
       const result = await uploadToCloudinary(req.file.buffer, "users");

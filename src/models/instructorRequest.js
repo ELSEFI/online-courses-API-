@@ -11,7 +11,7 @@ const instructorRequestSchema = new mongoose.Schema(
       en: { type: String, required: true },
       ar: { type: String, required: true },
     },
-    experience: {
+    experienceYears: {
       type: Number,
       required: true,
     },
@@ -19,7 +19,7 @@ const instructorRequestSchema = new mongoose.Schema(
       en: { type: String, required: true },
       ar: { type: String, required: true },
     },
-    cvURL: {
+    cvFile: {
       type: String,
       required: true,
     },
