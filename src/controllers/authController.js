@@ -162,6 +162,26 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+exports.resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User Not Found" });
+    if (user.emailVerified)
+      return res.status(400).json({ message: "This Email Already Verified" });
+
+    const code = Math.floor(100000 + Math.random() * 900000);
+    user.verificationCode = code;
+    user.verificationCodeExpire = Date.now() + 1000 * 60 * 10;
+    await user.save();
+    await sendEmail(user.email, code);
+    res.status(201).json({ message: "Verification code resent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 exports.profile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");

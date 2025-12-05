@@ -11,6 +11,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/login", authController.login);
 router.post("/google", authController.loginGoogle);
 router.post("/forget-password", authController.forgetPassword);
+router.post("/resend-verification",authController.resendVerification);
 router.patch("/reset-password/:token", authController.resetPassword);
 router.patch(
   "/update-profile",
