@@ -7,6 +7,7 @@ dotenv.config();
 const connectDB = require("./src/config/db");
 // ==ROUTES == //
 const userRoutes = require("./src/Routes/userRoutes");
+const adminRoutes = require("./src/Routes/adminRoutes");
 // ==ROUTES == //
 
 const app = express();
@@ -34,7 +35,15 @@ app.use(
 app.use(express.static("public"));
 
 // ROUTES
+
+// USERS //
 app.use("/api/v1/users", userRoutes);
+// USERS //
+
+// ADMIN //
+app.use("/api/v1/admin",adminRoutes)
+// ADMIN //
+
 // ROUTES
 app.get("/", (req, res) => {
   res.send("Welcome To Online Courses");

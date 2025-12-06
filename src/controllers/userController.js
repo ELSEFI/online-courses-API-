@@ -1,4 +1,3 @@
-const express = require("express");
 const instructorRequest = require("../models/instructorRequest");
 const fs = require("fs").promises;
 const path = require("path");
