@@ -2,9 +2,9 @@ import Aurora from "./Aurora";
 
 export const Home = () => {
   return (
-    <div className="relative w-full min-h-screen bg-black text-white overflow-hidden">
+    <>
       {/* Aurora Background */}
-      <div className="fixed inset-0 w-full h-full z-0">
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
         <Aurora
           colorStops={["#22c55e", "#a855f7", "#22c55e"]}
           blend={0.8}
@@ -12,6 +12,15 @@ export const Home = () => {
           speed={0.3}
         />
       </div>
-    </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen">
+        {/* Hero Section */}
+        <section className="min-h-screen flex items-center justify-center px-4 text-white">
+          <h1 className="text-5xl font-bold">مرحباً بكم</h1>
+        </section>
+
+      </div>
+    </>
   );
 };
