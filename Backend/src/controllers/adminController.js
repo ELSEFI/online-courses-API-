@@ -3,22 +3,21 @@ const instructorProfile = require("../models/instructorProfile");
 const User = require("../models/User");
 
 exports.getAllInstructors = async (req, res) => {
-  const instructors = await instructorProfile.find();
+  const instructors = await instructorProfile
+    .find()
+    .populate("userId", "name email profileImage");
   if (instructors.length === 0)
     return res.status(200).json({ message: "Not Instructors Founded!" });
-  await instructors.populate("userId", "name email profileImage");
   res.status(200).json(instructors);
 };
 
 exports.getInstructor = async (req, res) => {
   try {
-    const instructor = await instructorProfile.findById(
-      req.params.instructorId
-    );
+    const instructor = await instructorProfile
+      .findById(req.params.instructorId)
+      .populate("userId", "name email profileImage");
     if (!instructor)
       return res.status(404).json({ message: "Not Instructor With That Id" });
-
-    await instructor.populate("userId", "name email profileImage");
 
     res.status(200).json(instructor);
   } catch (error) {
@@ -75,7 +74,7 @@ exports.addInstructor = async (req, res) => {
     });
   }
   try {
-    let user = User.findOne({ email });
+    let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User Already Exist" });
 
     user = new User({
@@ -92,7 +91,7 @@ exports.addInstructor = async (req, res) => {
         en: bioEn,
         ar: bioAr,
       },
-      experienceYears: request.experienceYears,
+      experienceYears,
       jobTitle: {
         en: jobTitleEn,
         ar: jobTitleAr,
@@ -190,7 +189,7 @@ exports.rejectInstructor = async (req, res) => {
     const { rejectionReason_en, rejectionReason_ar } = req.body;
 
     if (!rejectionReason_en || !rejectionReason_ar) {
-      return res.status(404).json({
+      return res.status(400).json({
         message: "Rejection reason is required in both languages",
       });
     }
@@ -222,7 +221,7 @@ exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ role: "user" });
     if (users.length === 0)
-      return res.status(201).json({ message: "No Users" });
+      return res.status(404).json({ message: "No Users" });
 
     res.status(200).json(users);
   } catch (error) {
@@ -248,7 +247,7 @@ exports.getUser = async (req, res) => {
 
 exports.addUser = async (req, res) => {
   const { name, email, password } = req.body;
-  if (name || email || password)
+  if (!name || !email || !password)
     return res.status(400).json({ message: "All Inputs Required" });
 
   try {
