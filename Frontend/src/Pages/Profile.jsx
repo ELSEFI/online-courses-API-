@@ -174,7 +174,7 @@ const UserProfile = () => {
         formData.append("profileImage", editedData.profileImage);
       }
 
-      const response = await fetch("/api/v1/users/update-profile", {
+      const response = await fetch("http://localhost:5000/api/v1/users/update-profile", {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

@@ -227,9 +227,15 @@ exports.updateProfile = async (req, res) => {
     if (!user) return res.status(400).json({ message: "User Not found" });
 
     const { name, email } = req.body;
-    const userWithEmail = User.findOne({ email });
-    if (userWithEmail)
-      return res.status(400).json({ message: "Email Used Before" });
+    if (email) {
+      const userWithEmail = await User.findOne({ email });
+      if (
+        userWithEmail &&
+        userWithEmail._id.toString() !== user._id.toString()
+      ) {
+        return res.status(400).json({ message: "Email Used Before" });
+      }
+    }
 
     if (name) user.name = name;
     if (req.file) {
@@ -261,7 +267,7 @@ exports.updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: `Server Error + ${error}` });
   }
 };
 

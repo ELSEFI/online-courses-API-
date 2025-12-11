@@ -9,6 +9,8 @@ import UserProfile from "./Pages/Profile";
 import { UserLayout } from "./components/Layout/userLayout";
 import { Home } from "./Pages/home";
 import NotFound from "./Pages/404Page";
+import DashboardLayout from "./Pages/Admin/AdminPage";
+import Overview from "./Pages/Admin/Overview";
 function App() {
   return (
     <ThemeProvider>
@@ -23,6 +25,13 @@ function App() {
             <Route path="profile" element={<UserProfile />} />{" "}
             <Route path="profile/:userId" element={<UserProfile />} />{" "}
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+          </Route>
+          {/* Admin Routes */}
+          <Route path="/admin" element={<DashboardLayout />}>
+            <Route index element={<Overview />} />
+            {/* <Route path="users" element={<Users />} /> */}
+            {/* <Route path="instructors" element={<Instructors />} /> */}
+            {/* <Route path="courses" element={<Courses />} /> */}
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
