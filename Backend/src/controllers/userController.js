@@ -1,4 +1,6 @@
 const instructorRequest = require("../models/instructorRequest");
+const User = require("../models/User");
+const Contact = require("../models/contactWithUs");
 const fs = require("fs").promises;
 const path = require("path");
 
@@ -29,6 +31,11 @@ exports.beInstructor = async (req, res) => {
         message: "CV file is required",
       });
     }
+
+    if (!req.user.status)
+      return res.status(400).json({
+        message: "Your Not Allow To Be Instructor Please Connect With Us",
+      });
 
     const existingRequest = await instructorRequest.findOne({
       userId: req.user._id,
@@ -93,6 +100,30 @@ exports.beInstructor = async (req, res) => {
     }
     console.error(error);
 
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.contactWithUs = async (req, res) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message)
+    return res.status(400).json({ message: "Please Fill All Inputs" });
+  try {
+    let user = await Contact.findOne({ email });
+    if (user)
+      res.status(400).json({
+        message: "We Have Your Old Message We Will Notice You Soon...",
+      });
+
+    user = new Contact({
+      name,
+      email,
+      message,
+    });
+    await user.save();
+    res.status(200).json({ message: "We Well Contact With You Soon..." });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
