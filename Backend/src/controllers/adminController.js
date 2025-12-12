@@ -2,11 +2,13 @@ const instructorRequest = require("../models/instructorRequest");
 const instructorProfile = require("../models/instructorProfile");
 const User = require("../models/User");
 const Contact = require("../models/contactWithUs");
+const { sendReplyEmail } = require("../services/emailSender");
 
 exports.getAllInstructors = async (req, res) => {
   const instructors = await instructorProfile
     .find()
-    .populate("userId", "name email profileImage");
+    .populate("userId", "name email profileImage")
+    .sort({ createdAt: -1 });
   if (instructors.length === 0)
     return res.status(200).json({ message: "Not Instructors Founded!" });
   res.status(200).json(instructors);
@@ -221,7 +223,7 @@ exports.rejectInstructor = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: "user" });
+    const users = await User.find({ role: "user" }).sort({ createdAt: -1 });
     if (users.length === 0)
       return res.status(404).json({ message: "No Users" });
 
@@ -309,7 +311,7 @@ exports.deleteUser = async (req, res) => {
 exports.getAllMessages = async (req, res) => {
   try {
     const messages = await Contact.find();
-    if (messages.length)
+    if (messages.length === 0)
       return res.status(400).json({ message: "No Messages Yet!" });
 
     res.status(200).json(messages);

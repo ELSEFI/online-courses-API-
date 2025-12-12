@@ -11,6 +11,7 @@ const {
 const uploadCvs = require("../Middleware/uploadCvs");
 
 // ROUTES
+router.post("/contact-with-us",userController.contactWithUs)
 router.post("/register", authController.register);
 router.post("/verify-email", verifyEmail);
 router.post("/login", authController.login);

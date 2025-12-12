@@ -12,7 +12,9 @@ const adminRoutes = require("./src/Routes/adminRoutes");
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); // JSON body
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
 const PORT = process.env.PORT || 5000;
 
@@ -41,7 +43,7 @@ app.use("/api/v1/users", userRoutes);
 // USERS //
 
 // ADMIN //
-app.use("/api/v1/admin",adminRoutes)
+app.use("/api/v1/admin", adminRoutes);
 // ADMIN //
 
 // ROUTES
