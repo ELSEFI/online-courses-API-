@@ -31,4 +31,16 @@ router.patch(
   adminController.rejectInstructor
 );
 
+router.get("/users/messages", adminController.getAllMessages);
+router.delete("/users/messages/delete-message", adminController.deleteMessage);
+router.get("/users/messages/:messageId", adminController.getMessage);
+router.post(
+  "/users/messages/:messageId/reply-message",
+  adminController.replyMessage
+);
+router.delete(
+  "/users/messages/:messageId/delete-message",
+  adminController.deleteMessages
+);
+
 module.exports = router;

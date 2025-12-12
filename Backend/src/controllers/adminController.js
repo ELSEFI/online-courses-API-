@@ -1,6 +1,7 @@
 const instructorRequest = require("../models/instructorRequest");
 const instructorProfile = require("../models/instructorProfile");
 const User = require("../models/User");
+const Contact = require("../models/contactWithUs");
 
 exports.getAllInstructors = async (req, res) => {
   const instructors = await instructorProfile
@@ -299,6 +300,70 @@ exports.deleteUser = async (req, res) => {
     await User.findByIdAndDelete(user._id);
 
     res.status(200).json({ message: "User Deleted Successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.getAllMessages = async (req, res) => {
+  try {
+    const messages = await Contact.find();
+    if (messages.length)
+      return res.status(400).json({ message: "No Messages Yet!" });
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+exports.getMessage = async (req, res) => {
+  try {
+    const message = await Contact.findById(req.params.messageId);
+    if (!message)
+      return res.status(400).json({ message: "No Message Founded" });
+
+    res.status(200).json(message);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.replyMessage = async (req, res) => {
+  try {
+    const message = await Contact.findById(req.params.messageId).select(
+      "email"
+    );
+    const { reply } = req.body;
+    if (!reply)
+      return res.status(400).json({ message: "You Must Fill a reply input" });
+    await sendReplyEmail(message.email, reply);
+
+    res.status(200).json({ message: "Reply sent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.deleteMessages = async (req, res) => {
+  try {
+    await Contact.deleteMany();
+    res.status(200).json({ message: "Messages Deleted Successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.deleteMessage = async (req, res) => {
+  try {
+    const message = await Contact.findById(req.params.messageId);
+    if (!message) return res.status(404).json({ message: "Message Not Found" });
+    await Contact.findByIdAndDelete(message._id);
+    res.status(200).json({ message: "Message Deleted Successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

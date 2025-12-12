@@ -1,8 +1,10 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { verifyGoogleToken } = require("../services/googleAuthService");
-const { sendEmail } = require("../services/emailSender");
-const { sendResetPasswordEmail } = require("../services/resetPasswordEmail");
+const {
+  sendEmail,
+  sendResetPasswordEmail,
+} = require("../services/emailSender");
 const { uploadToCloudinary } = require("../services/cloudinaryUpload");
 const crypto = require("crypto");
 
@@ -201,7 +203,9 @@ exports.profile = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).select("-password");
+    const user = await User.findById(req.params.userId).select(
+      "name role profileImage"
+    );
     if (!user) return res.status(404).json({ message: "No User Founded!" });
 
     // Convert user to object and add full image URL
